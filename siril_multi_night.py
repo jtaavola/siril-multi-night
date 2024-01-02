@@ -157,12 +157,3 @@ def process(
 
         # register and stack
         _run_siril_script(output_path, siril_stack_script_path)
-
-
-if __name__ == "__main__":
-    process(
-        ["./data/", "./data2"],
-        "./output",
-        "./calibrate-script.ssf",
-        "./stack-script.ssf",
-    )
