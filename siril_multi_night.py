@@ -1,5 +1,8 @@
 """
-Test
+Process multiple nights in Siril
+
+Exports:
+process - process multiple sessions using a Siril calibration script and a Siril stacking script
 """
 import os
 import shutil
