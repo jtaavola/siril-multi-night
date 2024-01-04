@@ -134,7 +134,7 @@ def process(
     siril_calibrate_script_path: str,
     siril_stack_script_path: str,
     process_dir: str = "process",
-    seq_name: str = "pp_light"
+    seq_name: str = "pp_light",
 ):
     """
     Process multiple sessions using Siril. Each session will be calibrated individually with
@@ -160,3 +160,51 @@ def process(
 
         # register and stack
         _run_siril_script(output_path, siril_stack_script_path)
+
+
+if __name__ == "__main__":
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser(
+        description="""
+        Process multiple nights in Siril
+        """
+    )
+    parser.add_argument(
+        "--sessions",
+        nargs="+",
+        dest="input_sessions",
+        help="the list of paths to the sessions of data",
+        metavar="",
+        required=True,
+    )
+    parser.add_argument(
+        "--calibrate-script",
+        dest="input_calibrate_script",
+        help="the path to the Siril calibration script",
+        metavar="",
+        required=True,
+    )
+    parser.add_argument(
+        "--stack-script",
+        dest="input_stack_script",
+        help="the path to the Siril stacking file",
+        metavar="",
+        required=True,
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="input_output",
+        help="the path to the output directory",
+        metavar="",
+        required=True,
+    )
+
+    args = parser.parse_args()
+    process(
+        args.input_sessions,
+        args.input_output,
+        args.input_calibrate_script,
+        args.input_stack_script,
+    )
