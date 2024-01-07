@@ -148,7 +148,7 @@ def process(
     siril_calibrate_script_path -- the path to the Siril calibration script
     siril_stack_script_path -- the path to the Siril stacking script
     process_dir -- the name of the process directory (default: "process")
-    seq_name -- the sequence name of the preprocessed light files (default: "seq_name")
+    seq_name -- the sequence name of the preprocessed light files (default: "pp_light")
     """
     with _SirilContext():
         # calibrate each session individually
