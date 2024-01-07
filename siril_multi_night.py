@@ -7,23 +7,25 @@ process - process multiple sessions using a Siril calibration script and a Siril
 import os
 import shutil
 import re
+import sys
 
 from pysiril.siril import Siril
 from pysiril.wrapper import Wrapper
 
 
-siril = Siril()
-cmd = Wrapper(siril)
-
-
 class _SirilContext:
     """Context manager for using Siril"""
 
+    def __init__(self):
+        self.siril = Siril()
+        self.cmd = Wrapper(self.siril)
+
     def __enter__(self):
-        siril.Open()
+        self.siril.Open()
+        return self.siril, self.cmd
 
     def __exit__(self, *_):
-        siril.Close()
+        self.siril.Close()
 
 
 class _SirilCd:
@@ -32,18 +34,20 @@ class _SirilCd:
 
     Parameters:
     working_dir -- the path to the working directory for executing Siril commands
+    cmd_wrapper -- the Siril command wrapper instance
     """
 
-    def __init__(self, working_dir: str):
+    def __init__(self, working_dir: str, cmd_wrapper: Wrapper):
         self.working_dir = _abspath(working_dir)
+        self.cmd_wrapper = cmd_wrapper
         self.saved_path = ""
 
     def __enter__(self):
         self.saved_path = os.getcwd()
-        cmd.cd(self.working_dir)
+        self.cmd_wrapper.cd(self.working_dir)
 
     def __exit__(self, *_):
-        cmd.cd(self.saved_path)
+        self.cmd_wrapper.cd(self.saved_path)
 
 
 def _abspath(path: str):
@@ -67,19 +71,6 @@ def _write_conversion_file(conversion_map: dict[str, str], output_path: str):
             conversion_file.write(f"'{original}' -> '{output}'\n")
 
 
-def _run_siril_script(working_dir: str, siril_script_path: str):
-    """
-    Run a Siril script.
-
-    Parameters:
-    working_dir -- the path to the working directory
-    siril_script_path -- the path to the Siril script
-    """
-    siril_script_abs_path = _abspath(siril_script_path)
-    with _SirilCd(working_dir):
-        siril.Script(siril_script_abs_path)
-
-
 def _merge_sessions(
     session_paths: list[str],
     output_path: str,
@@ -98,8 +89,6 @@ def _merge_sessions(
     seq_name -- the sequence name of the preprocessed light files
     """
     output_abs_path = _abspath(output_path)
-    if not os.path.exists(output_abs_path):
-        os.mkdir(output_abs_path)
 
     merge_conversion_map: dict[str, str] = {}
     # counter for the new merged sequence
@@ -150,16 +139,30 @@ def process(
     process_dir -- the name of the process directory (default: "process")
     seq_name -- the sequence name of the preprocessed light files (default: "pp_light")
     """
-    with _SirilContext():
-        # calibrate each session individually
-        for session_path in session_paths:
-            _run_siril_script(session_path, siril_calibrate_script_path)
+    output_abs_path = _abspath(output_path)
+    if not os.path.exists(output_abs_path):
+        os.mkdir(output_abs_path)
 
-        # merge sessions together
-        _merge_sessions(session_paths, output_path, process_dir, seq_name)
+    stdout = sys.stdout
+    log_file_path = os.path.join(output_abs_path, "siril-mulit-night.log")
+    with open(log_file_path, "w", encoding="utf-8") as sys.stdout:
+        with _SirilContext() as [siril, cmd_wrapper]:
+            # calibrate each session individually
+            for session_path in session_paths:
+                print(f"Calibrating session: {session_path} ...", file=stdout)
+                siril_calibrate_script_abs_path = _abspath(siril_calibrate_script_path)
+                with _SirilCd(session_path, cmd_wrapper):
+                    siril.Script(siril_calibrate_script_abs_path)
 
-        # register and stack
-        _run_siril_script(output_path, siril_stack_script_path)
+            # merge sessions together
+            print("Merging sessions together ...", file=stdout)
+            _merge_sessions(session_paths, output_path, process_dir, seq_name)
+
+            # register and stack
+            print("Stacking merged sessions ...", file=stdout)
+            siril_stack_script_abs_path = _abspath(siril_stack_script_path)
+            with _SirilCd(output_path, cmd_wrapper):
+                siril.Script(siril_stack_script_abs_path)
 
 
 if __name__ == "__main__":
