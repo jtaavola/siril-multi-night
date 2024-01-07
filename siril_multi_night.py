@@ -200,6 +200,23 @@ if __name__ == "__main__":
         metavar="",
         required=True,
     )
+    parser.add_argument(
+        "-p",
+        "--process-dir",
+        dest="input_process_dir",
+        help="the name of the Siril process directories",
+        metavar="",
+        required=False,
+        default="process",
+    )
+    parser.add_argument(
+        "--seq-name",
+        dest="input_seq_name",
+        help="the sequence name of the preprocessed light files",
+        metavar="",
+        required=False,
+        default="pp_light",
+    )
 
     args = parser.parse_args()
     process(
@@ -207,4 +224,6 @@ if __name__ == "__main__":
         args.input_output,
         args.input_calibrate_script,
         args.input_stack_script,
+        args.input_process_dir,
+        args.input_seq_name,
     )
