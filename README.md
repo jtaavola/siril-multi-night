@@ -27,11 +27,11 @@ pipenv run python3 siril_multi_night.py \
 
 #### Options
 
-| Option | Required | Description |
-| - | - | - |
-| `--sessions` | ✅ | The list of paths to the sessions of data. |
-| `--calibrate-script` | ✅ | The path to the Siril calibration script. |
-| `--stack-script` | ✅ | The path to the Siril stacking file. |
-| `-o, --output` | ✅ | The path to the output directory. |
-| `-p, --process-dir` | ❌ | The name of the Siril process directories. |
-| `--seq-name` | ❌ | The sequence name of the preprocessed light files. |
+| Option | Required | Default | Description |
+| - | - | - | - |
+| `--sessions` | ✅ | | The list of paths to the sessions of data. |
+| `--calibrate-script` | ✅ | | The path to the Siril calibration script. |
+| `--stack-script` | ✅ | | The path to the Siril stacking file. |
+| `-o, --output` | ✅ | | The path to the output directory. |
+| `-p, --process-dir` | ❌ | `process` | The name of the Siril process directories. |
+| `--seq-name` | ❌ | `pp_light` | The sequence name of the preprocessed light files. |
