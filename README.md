@@ -8,17 +8,22 @@ Process astrophotography data from multiple nights using Siril.
 ### Prerequisite
 
 - [siril-cli](https://siril.org/download/) (comes with the Siril desktop application)
-- [pipenv](https://pipenv.pypa.io/en/latest/)
 
 ### CLI
 
-Install dependencies with
+Install dependencies to a [venv](https://docs.python.org/3/library/venv.html)
 ```sh
-pipenv install
+# create the venv
+python -m venv .venv
+# activate the venv
+source .venv/bin/activate
+# install dependencies
+python -m pip install -r requirements.txt
 ```
+
 Run `siril-multi-night`
 ```sh
-pipenv run python3 siril_multi_night.py \
+python3 siril_multi_night.py \
 	--sessions path/to/session1 path/to/session2 \
 	--calibrate-script path/to/calibrate-script.ssf \
 	--stack-script path/to/stack-script.ssf \
