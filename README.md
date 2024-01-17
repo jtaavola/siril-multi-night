@@ -23,7 +23,7 @@ python -m pip install -r requirements.txt
 
 Run `siril-multi-night`
 ```sh
-python3 siril_multi_night.py \
+python siril_multi_night.py \
 	--sessions path/to/session1 path/to/session2 \
 	--calibrate-script path/to/calibrate-script.ssf \
 	--stack-script path/to/stack-script.ssf \
